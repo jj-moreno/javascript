@@ -183,10 +183,11 @@ const operations = [
     }
 ];
 
-const doMath = function () {
+const doMath = function (num1, num2) {
     const randNum = Math.floor(Math.random() * 4);
     console.log(operations[randNum].name);
-    return operations[randNum](2, 3);
+    const operation = operations[randNum];
+    return operation(num1, num2);
  };
 
-doMath();
+doMath(2, 3);
