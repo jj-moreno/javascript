@@ -1,57 +1,49 @@
-console.log("time to start the timer!");
-
 const timer = document.querySelector('p');
-let timeInSecs = 0;
-let counter = 0;
+let timerTotalMins;
+let timeRemainingInSecs;
+let interval;
+let secsPassed = 0;
 
-const interval = setInterval(startTimer, 1000);
+const getTimerTotalSecs = () => {
+  return timerTotalMins * 60;
+};
 
-function convertTime(seconds) {
-    const min = Math.floor(seconds / 60);
-    const sec = seconds % 60;
-    return `${min}:${sec}`;
-}
+const getTimeRemainingInSecs = (secsPassed) => {
+  return getTimerTotalSecs() - secsPassed;
+};
 
-function startTimer() {
-
-    updateTime();    
-}
-
-
-function updateTime() {
-    counter++;
-    timer.textContent = `${convertTime(timeInSecs - counter)}`;
-
-    if (counter === timeInSecs) {
-        clearInterval(interval);
+const start = () => {
+  interval = setInterval(() => {
+    secsPassed += 1;
+    timeRemainingInSecs = getTimeRemainingInSecs(secsPassed);
+    timer.textContent = timeRemainingInSecs;
+    if (timeRemainingInSecs < 0) {
+      stop(interval);
     }
-}
+  }, 1000);
+};
 
-function stopTimer() {
-    timer.textContent = '0:00';
-    clearInterval(interval);
-}
+const stop = () => {
+  clearInterval(interval);
+};
 
-function resetTimer() {
-    timer.textContent = `${timeInSecs / 60}:00`;
-    counter = 0;
-}
+const reset = () => {
+  secsPassed = 0;
+  timer.textContent = timerTotalMins;
+};
 
-function setEventListeners() {
-    document.querySelector("#start").addEventListener('click', startTimer);
-    document.querySelector("#stop").addEventListener('click', stopTimer);
-    document.querySelector("#reset").addEventListener('click', resetTimer);
-}
+const addTimerButtonListeners = () => {
+  document.getElementById('start').addEventListener('click', start);
+  document.getElementById('stop').addEventListener('click', stop);
+  document.getElementById('reset').addEventListener('click', reset);
+};
 
-function init() {
-    setEventListeners();
-    const numOfMins = prompt('How many minutes would you like to set for your timer?');
-    if(parseInt(numOfMins)) {
-        timeInSecs = numOfMins * 60;
-        timer.textContent = `${numOfMins}:00`;
-    } else {
-        alert('Invalid number!');
-    }
-}
+const init = () => {
+  while (!parseInt(timerTotalMins)) {
+    timerTotalMins = prompt('how many minutes for timer?');
+  }
+  timer.textContent = timerTotalMins;
+  addTimerButtonListeners();
+};
 
 init();
