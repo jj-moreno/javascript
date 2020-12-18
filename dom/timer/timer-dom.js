@@ -1,56 +1,27 @@
-const getUrlParams = () => {
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  const timerMins = parseInt(urlParams.get('min'));
-  const timerSecs = parseInt(urlParams.get('sec'));
-  return {
-    mins: timerMins,
-    secs: timerSecs,
-  };
-};
-
-const getTotalSecs = (mins, secs) => {
-  return mins * 60 + secs;
-};
-
-const getTimer = () => {
-  return document.querySelector('#timer-display').textContent;
+const start = () => {
+  const timeRemainingInSecs = getTimeRemainingInSecs();
+  const timer = interval(timeRemainingInSecs);
+  addStopButtonListener(timer);
+  addResetButtonListener(timer);
 };
 
 const getTimeRemainingInSecs = () => {
-  const timer = getTimer();
+  const timer = document.querySelector('#timer-display').textContent;
   const splitTimer = timer.split(':');
   const mins = parseInt(splitTimer[0]);
   const secs = parseInt(splitTimer[1]);
   return getTotalSecs(mins, secs);
 };
 
-const start = () => {
-  const timeRemainingInSecs = getTimeRemainingInSecs();
-  const timer = interval(timeRemainingInSecs);
-  addStopButtonListener(timer);
+const getTotalSecs = (mins, secs) => {
+  return mins * 60 + secs;
 };
 
-const interval = (timerTotalSecs) => {
-  let timeRemainingInSecs = timerTotalSecs;
+const interval = (timeRemainingInSecs) => {
   return setInterval(() => {
     timeRemainingInSecs -= 1;
     updateTime(timeRemainingInSecs);
   }, 1000);
-};
-
-const addStopButtonListener = (timer) => {
-  document
-    .getElementById('stop')
-    .addEventListener('click', stop.bind(null, timer));
-};
-
-const stop = (interval) => {
-  clearInterval(interval);
-};
-
-const reset = () => {
-  updateTime(getTotalSecs());
 };
 
 const updateTime = (timeRemainingInSecs) => {
@@ -73,22 +44,50 @@ const prefixSingleDigitNumWithZero = (num) => {
   return `0${num}`;
 };
 
+const stop = (interval) => {
+  clearInterval(interval);
+};
+
+const addStopButtonListener = (timer) => {
+  document
+    .getElementById('stop')
+    .addEventListener('click', stop.bind(null, timer));
+};
+
+const reset = (timer) => {
+  const resetTimerTotalSecs = getTimerTotalSecsInit();
+  updateTime(resetTimerTotalSecs);
+  stop(timer);
+  start(resetTimerTotalSecs);
+};
+
+const addResetButtonListener = (timer) => {
+  timeRemainingInSecs = document
+    .getElementById('reset')
+    .addEventListener('click', reset.bind(null, timer));
+};
+
 const init = () => {
-  const urlParams = getUrlParams();
-  const timerTotalSecs = getTotalSecs(urlParams['mins'], urlParams['secs']);
+  const timerTotalSecs = getTimerTotalSecsInit();
   updateTime(timerTotalSecs);
   addStartButtonListener();
-  addResetButtonListener(timerTotalSecs);
+};
+const getTimerTotalSecsInit = () => {
+  const urlParams = getUrlParams();
+  const timerTotalSecs = getTotalSecs(urlParams['mins'], urlParams['secs']);
+  return timerTotalSecs;
+};
+
+const getUrlParams = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  return {
+    mins: parseInt(urlParams.get('min')),
+    secs: parseInt(urlParams.get('sec')),
+  };
 };
 
 const addStartButtonListener = () => {
   document.getElementById('start').addEventListener('click', start);
-};
-
-const addResetButtonListener = (timerTotalSecs) => {
-  document
-    .getElementById('reset')
-    .addEventListener('click', reset.bind(null, timerTotalSecs));
 };
 
 init();
